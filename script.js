@@ -18,7 +18,7 @@ async function getNewQuote() {
         // Make an asynchronous call to the API. 'await' pauses the function
         // until the request completes.
         const response = await fetch(API_URL);
-        
+
         // Check if the request was successful.
         if (!response.ok) {
             throw new Error(`Network response was not ok: ${response.statusText}`);
