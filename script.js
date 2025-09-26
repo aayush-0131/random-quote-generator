@@ -1,47 +1,54 @@
-// Get references to the HTML elements we will be manipulating.
+// Get references to the HTML elements
 const quoteTextElement = document.getElementById('quote-text');
 const authorTextElement = document.getElementById('author-text');
 const newQuoteBtn = document.getElementById('new-quote-btn');
 
-// The URL of the free quote API.
-const API_URL = 'https://api.quotable.io/random';
+// API that allows CORS
+const API_URL = 'https://api.quotable.io/quotes/random';
 
 /**
  * Fetches a random quote from the API and updates the DOM.
  */
 async function getNewQuote() {
-    // Show a loading message while fetching.
+    // Show a loading message while fetching
     quoteTextElement.textContent = 'Fetching a new quote...';
     authorTextElement.textContent = '';
 
     try {
-        // Make an asynchronous call to the API. 'await' pauses the function
-        // until the request completes.
+        // Try the CORS-enabled API endpoint
         const response = await fetch(API_URL);
 
-        // Check if the request was successful.
         if (!response.ok) {
             throw new Error(`Network response was not ok: ${response.statusText}`);
         }
 
-        // Parse the JSON data from the response.
         const data = await response.json();
+        const quote = Array.isArray(data) ? data[0] : data;
 
-        // Update the text content of our HTML elements with the new quote and author.
-        quoteTextElement.textContent = data.content;
-        authorTextElement.textContent = data.author;
+        quoteTextElement.textContent = quote.content;
+        authorTextElement.textContent = quote.author;
 
     } catch (error) {
-        // If anything goes wrong, log the error and show a user-friendly message.
+        // Fall back to local quotes if API fails
         console.error('Fetch error:', error);
-        quoteTextElement.textContent = 'Sorry, we couldn\'t fetch a quote. Please try again.';
-        authorTextElement.textContent = 'Error';
+
+        // Use one of the local quotes as a fallback
+        const fallbackQuotes = [
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+            { text: "Life is what happens when you're busy making other plans.", author: "John Lennon" },
+            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+            { text: "Success is not final, failure is not fatal: It is the courage to continue that counts.", author: "Winston Churchill" },
+            { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" }
+        ];
+
+        const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+        quoteTextElement.textContent = randomQuote.text;
+        authorTextElement.textContent = randomQuote.author;
     }
 }
 
-// Add a 'click' event listener to the button. When clicked, it will
-// call our getNewQuote function.
+// Add event listener to the button
 newQuoteBtn.addEventListener('click', getNewQuote);
 
-// Call the function once when the page first loads to get an initial quote.
+// Get an initial quote when the page loads
 getNewQuote();
